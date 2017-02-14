@@ -1,0 +1,23 @@
+[HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create([Bind(Include = "id,comment1,taskId")] comment comment)
+        {
+            if (ModelState.IsValid)
+            {
+                var comments = db.comments.FirstOrDefault(x => x.comment1== comment.comment1);
+              
+                if (comments == null)
+                {
+                    db.comments.Add(comment);
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+                else {
+                    ModelState.AddModelError("", "Unable to save changes. Duplicate values are not allowed");
+                }
+                
+            }
+
+            ViewBag.taskId = new SelectList(db.tblTasks, "id", "TaskSummary", comment.taskId);
+            return View(comment);
+        }
